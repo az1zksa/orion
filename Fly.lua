@@ -27,7 +27,7 @@ local function ShowToast(message)
     toast.Size = UDim2.new(0, 300, 0, 75)
     toast.Position = UDim2.new(1, -25, 1, 120)
     toast.AnchorPoint = Vector2.new(1, 1)
-    toast.BackgroundColor3 = Color3.fromRGB(25, 25, 35) -- خلفية أجمل
+    toast.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
     toast.BorderSizePixel = 0
     toast.BackgroundTransparency = 0.05
     toast.Parent = toastGui
@@ -40,7 +40,7 @@ local function ShowToast(message)
     icon.Size = UDim2.new(0, 45, 0, 45)
     icon.Position = UDim2.new(0, 15, 0, 15)
     icon.BackgroundTransparency = 1
-    icon.Image = "rbxassetid://6031071050" -- أيقونة Roblox-style جميلة
+    icon.Image = "rbxassetid://15828140506"
 
     local iconCorner = Instance.new("UICorner", icon)
     iconCorner.CornerRadius = UDim.new(0, 8)
@@ -58,7 +58,7 @@ local function ShowToast(message)
 
     -- Sound
     local sound = Instance.new("Sound", toast)
-    sound.SoundId = "rbxassetid://4590662766" -- صوت إشعار جميل
+    sound.SoundId = "rbxassetid://4590662766"
     sound.Volume = 1
     sound:Play()
 
@@ -77,6 +77,71 @@ local function ShowToast(message)
     task.wait(0.4)
     toast:Destroy()
 end
+
+--==========================
+--== Welcome Toast (AzizGames)
+--==========================
+
+task.wait(1)
+
+local welcome = Instance.new("Frame")
+welcome.Size = UDim2.new(0, 320, 0, 85)
+welcome.Position = UDim2.new(1, -25, 1, 140)
+welcome.AnchorPoint = Vector2.new(1, 1)
+welcome.BackgroundColor3 = Color3.fromRGB(35, 35, 55)
+welcome.BackgroundTransparency = 0.05
+welcome.BorderSizePixel = 0
+welcome.Parent = toastGui
+
+local wcCorner = Instance.new("UICorner", welcome)
+wcCorner.CornerRadius = UDim.new(0, 14)
+
+local wcIcon = Instance.new("ImageLabel", welcome)
+wcIcon.Size = UDim2.new(0, 50, 0, 50)
+wcIcon.Position = UDim2.new(0, 15, 0, 17)
+wcIcon.BackgroundTransparency = 1
+wcIcon.Image = "rbxassetid://15828140506"
+
+local wcIconCorner = Instance.new("UICorner", wcIcon)
+wcIconCorner.CornerRadius = UDim.new(0, 10)
+
+local wcTitle = Instance.new("TextLabel", welcome)
+wcTitle.Size = UDim2.new(1, -80, 0, 35)
+wcTitle.Position = UDim2.new(0, 75, 0, 5)
+wcTitle.BackgroundTransparency = 1
+wcTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+wcTitle.Font = Enum.Font.GothamBold
+wcTitle.TextSize = 19
+wcTitle.TextXAlignment = Enum.TextXAlignment.Left
+wcTitle.Text = "مرحباً في Fly"
+
+local wcDesc = Instance.new("TextLabel", welcome)
+wcDesc.Size = UDim2.new(1, -80, 0, 40)
+wcDesc.Position = UDim2.new(0, 75, 0, 40)
+wcDesc.BackgroundTransparency = 1
+wcDesc.TextColor3 = Color3.fromRGB(220, 220, 220)
+wcDesc.Font = Enum.Font.Gotham
+wcDesc.TextSize = 14
+wcDesc.TextXAlignment = Enum.TextXAlignment.Left
+wcDesc.Text = "من صنع AzizGames – استمتع! أقوى تحديث!"
+
+local wcSound = Instance.new("Sound", welcome)
+wcSound.SoundId = "rbxassetid://4590662766"
+wcSound.Volume = 1
+wcSound:Play()
+
+TweenService:Create(welcome, TweenInfo.new(0.28, Enum.EasingStyle.Quint), {
+    Position = UDim2.new(1, -25, 1, -25)
+}):Play()
+
+task.wait(4)
+
+TweenService:Create(welcome, TweenInfo.new(0.28, Enum.EasingStyle.Quint), {
+    Position = UDim2.new(1, -25, 1, 140)
+}):Play()
+
+task.wait(0.3)
+welcome:Destroy()
 
 --==========================
 --== Fly GUI Buttons =======
