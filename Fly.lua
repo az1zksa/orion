@@ -1,10 +1,11 @@
---// GUI Fly Script (With Speed Control)
+--// GUI Fly + Roblox-like Toast System (Full Script)
 
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 local uis = game:GetService("UserInputService")
 local run = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
 local flying = false
 local speed = 3
@@ -12,6 +13,57 @@ local speed = 3
 -- GUI
 local gui = Instance.new("ScreenGui")
 gui.Parent = game.CoreGui
+gui.Name = "FlyGUI"
+
+--==========================
+--== Roblox-like Toast UI ==
+--==========================
+
+local toastGui = Instance.new("ScreenGui", game.CoreGui)
+toastGui.Name = "ToastUI"
+
+local function ShowToast(message)
+    local toast = Instance.new("Frame")
+    toast.Size = UDim2.new(0, 260, 0, 60)
+    toast.Position = UDim2.new(1, -20, 1, 80) -- تحت يمين
+    toast.AnchorPoint = Vector2.new(1, 1)
+    toast.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    toast.BorderSizePixel = 0
+    toast.BackgroundTransparency = 0.1
+    toast.Parent = toastGui
+
+    local corner = Instance.new("UICorner", toast)
+    corner.CornerRadius = UDim.new(0, 10)
+
+    local label = Instance.new("TextLabel", toast)
+    label.Size = UDim2.new(1, -20, 1, 0)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 16
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Text = message
+
+    -- دخول toast (يصعد لفوق)
+    TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
+        Position = UDim2.new(1, -20, 1, -10)
+    }):Play()
+
+    task.wait(5)
+
+    -- خروج toast (ينزل لتحت)
+    TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
+        Position = UDim2.new(1, -20, 1, 80)
+    }):Play()
+
+    task.wait(0.4)
+    toast:Destroy()
+end
+
+--==========================
+--== Fly GUI Buttons =======
+--==========================
 
 -- Fly Toggle Button
 local flyBtn = Instance.new("TextButton")
@@ -63,15 +115,20 @@ bv.MaxForce = Vector3.new(0, 0, 0)
 bv.Velocity = Vector3.new(0, 0, 0)
 bv.Parent = hrp
 
--- Toggle Fly
+--==========================
+--== Fly Toggle Logic ======
+--==========================
+
 flyBtn.MouseButton1Click:Connect(function()
     flying = not flying
     if flying then
         flyBtn.Text = "Fly: ON"
         bv.MaxForce = Vector3.new(100000, 100000, 100000)
+        ShowToast("Fly تم تفعيله")
     else
         flyBtn.Text = "Fly: OFF"
         bv.MaxForce = Vector3.new(0, 0, 0)
+        ShowToast("Fly تم إيقافه")
     end
 end)
 
@@ -89,7 +146,10 @@ minusBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Fly Movement
+--==========================
+--== Fly Movement ==========
+--==========================
+
 run.RenderStepped:Connect(function()
     if flying then
         local dir = Vector3.new(0,0,0)
