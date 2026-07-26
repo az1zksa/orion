@@ -40,7 +40,7 @@ local function ShowToast(message)
     icon.Size = UDim2.new(0, 45, 0, 45)
     icon.Position = UDim2.new(0, 15, 0, 15)
     icon.BackgroundTransparency = 1
-    icon.Image = "rbxassetid://15828140506"
+    icon.Image = "rbxassetid://6031068437"
 
     local iconCorner = Instance.new("UICorner", icon)
     iconCorner.CornerRadius = UDim.new(0, 8)
