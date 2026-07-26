@@ -1,5 +1,5 @@
 --==========================
---== AzizGames Luxury Fly UI
+--== AzizGames Luxury Fly UI (With Drag + Close Button)
 --==========================
 
 local player = game.Players.LocalPlayer
@@ -19,22 +19,66 @@ local speed = 3
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "FlyGUI"
 
+-- Main Frame (Draggable)
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0, 200, 0, 200)
+mainFrame.Position = UDim2.new(0, 20, 0, 150)
+mainFrame.BackgroundTransparency = 1
+
+-- Dragging System
+local dragging = false
+local dragInput, dragStart, startPos
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+uis.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+uis.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
 --==========================
---== Luxury Effects (Blur)
+--== Close Button (X)
 --==========================
 
-local blur = Instance.new("BlurEffect", game.Lighting)
-blur.Size = 0
+local closeBtn = Instance.new("TextButton", mainFrame)
+closeBtn.Size = UDim2.new(0, 35, 0, 35)
+closeBtn.Position = UDim2.new(1, -40, 0, 0)
+closeBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 20
+closeBtn.Text = "X"
 
-TweenService:Create(blur, TweenInfo.new(1, Enum.EasingStyle.Quint), {
-    Size = 10
-}):Play()
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 8)
 
-task.wait(2)
-
-TweenService:Create(blur, TweenInfo.new(1, Enum.EasingStyle.Quint), {
-    Size = 0
-}):Play()
+local closeStroke = Instance.new("UIStroke", closeBtn)
+closeStroke.Thickness = 2
+closeStroke.Color = Color3.fromRGB(255, 50, 50)
 
 --==========================
 --== Toast System
@@ -43,9 +87,9 @@ TweenService:Create(blur, TweenInfo.new(1, Enum.EasingStyle.Quint), {
 local toastGui = Instance.new("ScreenGui", game.CoreGui)
 toastGui.Name = "ToastUI"
 
-local function ShowToast(message)
+local function ShowToast(message, soundId)
     local toast = Instance.new("Frame")
-    toast.Size = UDim2.new(0, 320, 0, 85)
+    toast.Size = UDim2.new(0, 330, 0, 90)
     toast.Position = UDim2.new(1, -30, 1, 140)
     toast.AnchorPoint = Vector2.new(1, 1)
     toast.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
@@ -56,9 +100,8 @@ local function ShowToast(message)
 
     -- Glow
     local glow = Instance.new("UIStroke", toast)
-    glow.Thickness = 2
+    glow.Thickness = 3
     glow.Color = Color3.fromRGB(0, 255, 180)
-    glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
     -- Gradient
     local grad = Instance.new("UIGradient", toast)
@@ -69,7 +112,7 @@ local function ShowToast(message)
 
     -- Icon
     local icon = Instance.new("ImageLabel", toast)
-    icon.Size = UDim2.new(0, 50, 0, 50)
+    icon.Size = UDim2.new(0, 55, 0, 55)
     icon.Position = UDim2.new(0, 15, 0, 17)
     icon.BackgroundTransparency = 1
     icon.Image = "rbxassetid://6031068437"
@@ -87,7 +130,7 @@ local function ShowToast(message)
 
     -- Sound
     local sound = Instance.new("Sound", toast)
-    sound.SoundId = "rbxassetid://4590662766"
+    sound.SoundId = soundId
     sound.Volume = 1
     sound:Play()
 
@@ -108,130 +151,61 @@ local function ShowToast(message)
 end
 
 --==========================
---== Luxury Welcome Screen
+--== Close Button Logic
 --==========================
 
-local welcome = Instance.new("Frame", toastGui)
-welcome.Size = UDim2.new(0, 380, 0, 120)
-welcome.Position = UDim2.new(0.5, 0, 0.5, 0)
-welcome.AnchorPoint = Vector2.new(0.5, 0.5)
-welcome.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
-welcome.BackgroundTransparency = 0.05
+closeBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
 
-Instance.new("UICorner", welcome).CornerRadius = UDim.new(0, 20)
-
--- Glow
-local wGlow = Instance.new("UIStroke", welcome)
-wGlow.Thickness = 3
-wGlow.Color = Color3.fromRGB(0, 255, 200)
-
--- Gradient
-local wGrad = Instance.new("UIGradient", welcome)
-wGrad.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 30)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 50, 80))
-}
-
--- Icon
-local wIcon = Instance.new("ImageLabel", welcome)
-wIcon.Size = UDim2.new(0, 60, 0, 60)
-wIcon.Position = UDim2.new(0, 20, 0, 30)
-wIcon.BackgroundTransparency = 1
-wIcon.Image = "rbxassetid://15828140506"
-Instance.new("UICorner", wIcon).CornerRadius = UDim.new(0, 12)
-
--- Title
-local wTitle = Instance.new("TextLabel", welcome)
-wTitle.Size = UDim2.new(1, -100, 0, 40)
-wTitle.Position = UDim2.new(0, 100, 0, 10)
-wTitle.BackgroundTransparency = 1
-wTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-wTitle.Font = Enum.Font.GothamBold
-wTitle.TextSize = 22
-wTitle.Text = "مرحباً في Fly"
-
--- Desc
-local wDesc = Instance.new("TextLabel", welcome)
-wDesc.Size = UDim2.new(1, -100, 0, 40)
-wDesc.Position = UDim2.new(0, 100, 0, 55)
-wDesc.BackgroundTransparency = 1
-wDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
-wDesc.Font = Enum.Font.Gotham
-wDesc.TextSize = 16
-wDesc.Text = "من صنع AzizGames – استمتع بأقوى واجهة فاخرة!"
-
--- Sound (Luxury)
-local wSound = Instance.new("Sound", welcome)
-wSound.SoundId = "rbxassetid://9118823102" -- صوت فاخر
-wSound.Volume = 1
-wSound:Play()
-
--- Animation
-welcome.Size = UDim2.new(0, 0, 0, 0)
-TweenService:Create(welcome, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {
-    Size = UDim2.new(0, 380, 0, 120)
-}):Play()
-
-task.wait(4)
-
-TweenService:Create(welcome, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
-    Size = UDim2.new(0, 0, 0, 0)
-}):Play()
-
-task.wait(0.5)
-welcome:Destroy()
+    ShowToast(
+        "شكراً على تجربتك Fly – يوماً سعيداً! – AzizGames",
+        "rbxassetid://9118823102" -- صوت فاخر خاص للوداع
+    )
+end)
 
 --==========================
---== Buttons
+--== Fly Buttons (Inside mainFrame)
 --==========================
 
-local function style(btn)
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
-
-    local stroke = Instance.new("UIStroke", btn)
-    stroke.Thickness = 2
-    stroke.Color = Color3.fromRGB(0, 255, 180)
-end
-
-local flyBtn = Instance.new("TextButton", gui)
+local flyBtn = Instance.new("TextButton", mainFrame)
 flyBtn.Size = UDim2.new(0, 140, 0, 45)
-flyBtn.Position = UDim2.new(0, 20, 0, 200)
+flyBtn.Position = UDim2.new(0, 0, 0, 50)
 flyBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
 flyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 flyBtn.Font = Enum.Font.GothamBold
 flyBtn.TextSize = 16
 flyBtn.Text = "Fly: OFF"
-style(flyBtn)
+Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0, 10)
 
-local speedLabel = Instance.new("TextLabel", gui)
+local speedLabel = Instance.new("TextLabel", mainFrame)
 speedLabel.Size = UDim2.new(0, 140, 0, 35)
-speedLabel.Position = UDim2.new(0, 20, 0, 250)
+speedLabel.Position = UDim2.new(0, 0, 0, 100)
 speedLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
 speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedLabel.Font = Enum.Font.GothamBold
 speedLabel.TextSize = 14
 speedLabel.Text = "Speed: " .. speed
-style(speedLabel)
+Instance.new("UICorner", speedLabel).CornerRadius = UDim.new(0, 10)
 
-local plusBtn = Instance.new("TextButton", gui)
+local plusBtn = Instance.new("TextButton", mainFrame)
 plusBtn.Size = UDim2.new(0, 65, 0, 35)
-plusBtn.Position = UDim2.new(0, 20, 0, 295)
+plusBtn.Position = UDim2.new(0, 0, 0, 145)
 plusBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
 plusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 plusBtn.Font = Enum.Font.GothamBold
 plusBtn.TextSize = 18
 plusBtn.Text = "+"
-style(plusBtn)
+Instance.new("UICorner", plusBtn).CornerRadius = UDim.new(0, 10)
 
-local minusBtn = Instance.new("TextButton", gui)
+local minusBtn = Instance.new("TextButton", mainFrame)
 minusBtn.Size = UDim2.new(0, 65, 0, 35)
-minusBtn.Position = UDim2.new(0, 95, 0, 295)
+minusBtn.Position = UDim2.new(0, 75, 0, 145)
 minusBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
 minusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 minusBtn.Font = Enum.Font.GothamBold
 minusBtn.TextSize = 18
 minusBtn.Text = "-"
-style(minusBtn)
+Instance.new("UICorner", minusBtn).CornerRadius = UDim.new(0, 10)
 
 --==========================
 --== Fly Logic
@@ -246,11 +220,11 @@ flyBtn.MouseButton1Click:Connect(function()
     if flying then
         flyBtn.Text = "Fly: ON"
         bv.MaxForce = Vector3.new(100000, 100000, 100000)
-        ShowToast("تم تفعيل الطيران")
+        ShowToast("تم تفعيل الطيران", "rbxassetid://4590662766")
     else
         flyBtn.Text = "Fly: OFF"
         bv.MaxForce = Vector3.new(0, 0, 0)
-        ShowToast("تم إيقاف الطيران")
+        ShowToast("تم إيقاف الطيران", "rbxassetid://4590662766")
     end
 end)
 
