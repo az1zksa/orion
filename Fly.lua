@@ -1,4 +1,6 @@
---// GUI Fly + Enhanced Roblox-like Toast (Icon + Sound)
+--==========================
+--== AzizGames Luxury Fly UI
+--==========================
 
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
@@ -10,13 +12,32 @@ local TweenService = game:GetService("TweenService")
 local flying = false
 local speed = 3
 
--- GUI
-local gui = Instance.new("ScreenGui")
-gui.Parent = game.CoreGui
+--==========================
+--== Main GUI
+--==========================
+
+local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "FlyGUI"
 
 --==========================
---== Enhanced Toast UI =====
+--== Luxury Effects (Blur)
+--==========================
+
+local blur = Instance.new("BlurEffect", game.Lighting)
+blur.Size = 0
+
+TweenService:Create(blur, TweenInfo.new(1, Enum.EasingStyle.Quint), {
+    Size = 10
+}):Play()
+
+task.wait(2)
+
+TweenService:Create(blur, TweenInfo.new(1, Enum.EasingStyle.Quint), {
+    Size = 0
+}):Play()
+
+--==========================
+--== Toast System
 --==========================
 
 local toastGui = Instance.new("ScreenGui", game.CoreGui)
@@ -24,26 +45,35 @@ toastGui.Name = "ToastUI"
 
 local function ShowToast(message)
     local toast = Instance.new("Frame")
-    toast.Size = UDim2.new(0, 300, 0, 75)
-    toast.Position = UDim2.new(1, -25, 1, 120)
+    toast.Size = UDim2.new(0, 320, 0, 85)
+    toast.Position = UDim2.new(1, -30, 1, 140)
     toast.AnchorPoint = Vector2.new(1, 1)
-    toast.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    toast.BorderSizePixel = 0
+    toast.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
     toast.BackgroundTransparency = 0.05
     toast.Parent = toastGui
 
-    local corner = Instance.new("UICorner", toast)
-    corner.CornerRadius = UDim.new(0, 12)
+    Instance.new("UICorner", toast).CornerRadius = UDim.new(0, 14)
+
+    -- Glow
+    local glow = Instance.new("UIStroke", toast)
+    glow.Thickness = 2
+    glow.Color = Color3.fromRGB(0, 255, 180)
+    glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+    -- Gradient
+    local grad = Instance.new("UIGradient", toast)
+    grad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 30)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 40, 60))
+    }
 
     -- Icon
     local icon = Instance.new("ImageLabel", toast)
-    icon.Size = UDim2.new(0, 45, 0, 45)
-    icon.Position = UDim2.new(0, 15, 0, 15)
+    icon.Size = UDim2.new(0, 50, 0, 50)
+    icon.Position = UDim2.new(0, 15, 0, 17)
     icon.BackgroundTransparency = 1
     icon.Image = "rbxassetid://6031068437"
-
-    local iconCorner = Instance.new("UICorner", icon)
-    iconCorner.CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", icon).CornerRadius = UDim.new(0, 10)
 
     -- Text
     local label = Instance.new("TextLabel", toast)
@@ -52,8 +82,7 @@ local function ShowToast(message)
     label.BackgroundTransparency = 1
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamBold
-    label.TextSize = 17
-    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.TextSize = 18
     label.Text = message
 
     -- Sound
@@ -62,16 +91,16 @@ local function ShowToast(message)
     sound.Volume = 1
     sound:Play()
 
-    -- دخول toast
+    -- Animation In
     TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
-        Position = UDim2.new(1, -25, 1, -20)
+        Position = UDim2.new(1, -30, 1, -25)
     }):Play()
 
     task.wait(4)
 
-    -- خروج toast
+    -- Animation Out
     TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
-        Position = UDim2.new(1, -25, 1, 120)
+        Position = UDim2.new(1, -30, 1, 140)
     }):Play()
 
     task.wait(0.4)
@@ -79,134 +108,141 @@ local function ShowToast(message)
 end
 
 --==========================
---== Welcome Toast (AzizGames)
+--== Luxury Welcome Screen
 --==========================
 
-task.wait(1)
-
-local welcome = Instance.new("Frame")
-welcome.Size = UDim2.new(0, 320, 0, 85)
-welcome.Position = UDim2.new(1, -25, 1, 140)
-welcome.AnchorPoint = Vector2.new(1, 1)
-welcome.BackgroundColor3 = Color3.fromRGB(35, 35, 55)
+local welcome = Instance.new("Frame", toastGui)
+welcome.Size = UDim2.new(0, 380, 0, 120)
+welcome.Position = UDim2.new(0.5, 0, 0.5, 0)
+welcome.AnchorPoint = Vector2.new(0.5, 0.5)
+welcome.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
 welcome.BackgroundTransparency = 0.05
-welcome.BorderSizePixel = 0
-welcome.Parent = toastGui
 
-local wcCorner = Instance.new("UICorner", welcome)
-wcCorner.CornerRadius = UDim.new(0, 14)
+Instance.new("UICorner", welcome).CornerRadius = UDim.new(0, 20)
 
-local wcIcon = Instance.new("ImageLabel", welcome)
-wcIcon.Size = UDim2.new(0, 50, 0, 50)
-wcIcon.Position = UDim2.new(0, 15, 0, 17)
-wcIcon.BackgroundTransparency = 1
-wcIcon.Image = "rbxassetid://15828140506"
+-- Glow
+local wGlow = Instance.new("UIStroke", welcome)
+wGlow.Thickness = 3
+wGlow.Color = Color3.fromRGB(0, 255, 200)
 
-local wcIconCorner = Instance.new("UICorner", wcIcon)
-wcIconCorner.CornerRadius = UDim.new(0, 10)
+-- Gradient
+local wGrad = Instance.new("UIGradient", welcome)
+wGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 30)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 50, 80))
+}
 
-local wcTitle = Instance.new("TextLabel", welcome)
-wcTitle.Size = UDim2.new(1, -80, 0, 35)
-wcTitle.Position = UDim2.new(0, 75, 0, 5)
-wcTitle.BackgroundTransparency = 1
-wcTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-wcTitle.Font = Enum.Font.GothamBold
-wcTitle.TextSize = 19
-wcTitle.TextXAlignment = Enum.TextXAlignment.Left
-wcTitle.Text = "مرحباً في Fly"
+-- Icon
+local wIcon = Instance.new("ImageLabel", welcome)
+wIcon.Size = UDim2.new(0, 60, 0, 60)
+wIcon.Position = UDim2.new(0, 20, 0, 30)
+wIcon.BackgroundTransparency = 1
+wIcon.Image = "rbxassetid://15828140506"
+Instance.new("UICorner", wIcon).CornerRadius = UDim.new(0, 12)
 
-local wcDesc = Instance.new("TextLabel", welcome)
-wcDesc.Size = UDim2.new(1, -80, 0, 40)
-wcDesc.Position = UDim2.new(0, 75, 0, 40)
-wcDesc.BackgroundTransparency = 1
-wcDesc.TextColor3 = Color3.fromRGB(220, 220, 220)
-wcDesc.Font = Enum.Font.Gotham
-wcDesc.TextSize = 14
-wcDesc.TextXAlignment = Enum.TextXAlignment.Left
-wcDesc.Text = "من صنع AzizGames – استمتع! أقوى تحديث!"
+-- Title
+local wTitle = Instance.new("TextLabel", welcome)
+wTitle.Size = UDim2.new(1, -100, 0, 40)
+wTitle.Position = UDim2.new(0, 100, 0, 10)
+wTitle.BackgroundTransparency = 1
+wTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+wTitle.Font = Enum.Font.GothamBold
+wTitle.TextSize = 22
+wTitle.Text = "مرحباً في Fly"
 
-local wcSound = Instance.new("Sound", welcome)
-wcSound.SoundId = "rbxassetid://4590662766"
-wcSound.Volume = 1
-wcSound:Play()
+-- Desc
+local wDesc = Instance.new("TextLabel", welcome)
+wDesc.Size = UDim2.new(1, -100, 0, 40)
+wDesc.Position = UDim2.new(0, 100, 0, 55)
+wDesc.BackgroundTransparency = 1
+wDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+wDesc.Font = Enum.Font.Gotham
+wDesc.TextSize = 16
+wDesc.Text = "من صنع AzizGames – استمتع بأقوى واجهة فاخرة!"
 
-TweenService:Create(welcome, TweenInfo.new(0.28, Enum.EasingStyle.Quint), {
-    Position = UDim2.new(1, -25, 1, -25)
+-- Sound (Luxury)
+local wSound = Instance.new("Sound", welcome)
+wSound.SoundId = "rbxassetid://9118823102" -- صوت فاخر
+wSound.Volume = 1
+wSound:Play()
+
+-- Animation
+welcome.Size = UDim2.new(0, 0, 0, 0)
+TweenService:Create(welcome, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {
+    Size = UDim2.new(0, 380, 0, 120)
 }):Play()
 
 task.wait(4)
 
-TweenService:Create(welcome, TweenInfo.new(0.28, Enum.EasingStyle.Quint), {
-    Position = UDim2.new(1, -25, 1, 140)
+TweenService:Create(welcome, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
+    Size = UDim2.new(0, 0, 0, 0)
 }):Play()
 
-task.wait(0.3)
+task.wait(0.5)
 welcome:Destroy()
 
 --==========================
---== Fly GUI Buttons =======
+--== Buttons
 --==========================
 
 local function style(btn)
-    local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 10)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+
+    local stroke = Instance.new("UIStroke", btn)
+    stroke.Thickness = 2
+    stroke.Color = Color3.fromRGB(0, 255, 180)
 end
 
-local flyBtn = Instance.new("TextButton")
-flyBtn.Parent = gui
+local flyBtn = Instance.new("TextButton", gui)
 flyBtn.Size = UDim2.new(0, 140, 0, 45)
 flyBtn.Position = UDim2.new(0, 20, 0, 200)
-flyBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+flyBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
 flyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 flyBtn.Font = Enum.Font.GothamBold
 flyBtn.TextSize = 16
 flyBtn.Text = "Fly: OFF"
 style(flyBtn)
 
-local speedLabel = Instance.new("TextLabel")
-speedLabel.Parent = gui
+local speedLabel = Instance.new("TextLabel", gui)
 speedLabel.Size = UDim2.new(0, 140, 0, 35)
 speedLabel.Position = UDim2.new(0, 20, 0, 250)
-speedLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+speedLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
 speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedLabel.Font = Enum.Font.GothamBold
 speedLabel.TextSize = 14
 speedLabel.Text = "Speed: " .. speed
 style(speedLabel)
 
-local plusBtn = Instance.new("TextButton")
-plusBtn.Parent = gui
+local plusBtn = Instance.new("TextButton", gui)
 plusBtn.Size = UDim2.new(0, 65, 0, 35)
 plusBtn.Position = UDim2.new(0, 20, 0, 295)
-plusBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+plusBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
 plusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 plusBtn.Font = Enum.Font.GothamBold
 plusBtn.TextSize = 18
 plusBtn.Text = "+"
 style(plusBtn)
 
-local minusBtn = Instance.new("TextButton")
-minusBtn.Parent = gui
+local minusBtn = Instance.new("TextButton", gui)
 minusBtn.Size = UDim2.new(0, 65, 0, 35)
 minusBtn.Position = UDim2.new(0, 95, 0, 295)
-minusBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+minusBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
 minusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 minusBtn.Font = Enum.Font.GothamBold
 minusBtn.TextSize = 18
 minusBtn.Text = "-"
 style(minusBtn)
 
-local bv = Instance.new("BodyVelocity")
-bv.MaxForce = Vector3.new(0, 0, 0)
-bv.Velocity = Vector3.new(0, 0, 0)
-bv.Parent = hrp
+--==========================
+--== Fly Logic
+--==========================
 
---==========================
---== Fly Toggle Logic ======
---==========================
+local bv = Instance.new("BodyVelocity", hrp)
+bv.MaxForce = Vector3.new(0, 0, 0)
 
 flyBtn.MouseButton1Click:Connect(function()
     flying = not flying
+
     if flying then
         flyBtn.Text = "Fly: ON"
         bv.MaxForce = Vector3.new(100000, 100000, 100000)
@@ -229,10 +265,6 @@ minusBtn.MouseButton1Click:Connect(function()
         speedLabel.Text = "Speed: " .. speed
     end
 end)
-
---==========================
---== Fly Movement ==========
---==========================
 
 run.RenderStepped:Connect(function()
     if flying then
