@@ -1,4 +1,4 @@
---// GUI Fly + Roblox-like Toast System (Full Script)
+--// GUI Fly + Roblox-like Toast (Icon + Sound)
 
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
@@ -35,15 +35,29 @@ local function ShowToast(message)
     local corner = Instance.new("UICorner", toast)
     corner.CornerRadius = UDim.new(0, 10)
 
+    -- Icon
+    local icon = Instance.new("ImageLabel", toast)
+    icon.Size = UDim2.new(0, 40, 0, 40)
+    icon.Position = UDim2.new(0, 10, 0, 10)
+    icon.BackgroundTransparency = 1
+    icon.Image = "rbxassetid://119290557148033" -- أيقونة جميلة
+
+    -- Text
     local label = Instance.new("TextLabel", toast)
-    label.Size = UDim2.new(1, -20, 1, 0)
-    label.Position = UDim2.new(0, 10, 0, 0)
+    label.Size = UDim2.new(1, -60, 1, 0)
+    label.Position = UDim2.new(0, 60, 0, 0)
     label.BackgroundTransparency = 1
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamBold
     label.TextSize = 16
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Text = message
+
+    -- Sound
+    local sound = Instance.new("Sound", toast)
+    sound.SoundId = "rbxassetid://138118203571469" -- صوت إشعار جميل
+    sound.Volume = 1
+    sound:Play()
 
     -- دخول toast (يصعد لفوق)
     TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
@@ -65,7 +79,6 @@ end
 --== Fly GUI Buttons =======
 --==========================
 
--- Fly Toggle Button
 local flyBtn = Instance.new("TextButton")
 flyBtn.Parent = gui
 flyBtn.Size = UDim2.new(0, 120, 0, 40)
@@ -76,7 +89,6 @@ flyBtn.Font = Enum.Font.GothamBold
 flyBtn.TextSize = 16
 flyBtn.Text = "Fly: OFF"
 
--- Speed Label
 local speedLabel = Instance.new("TextLabel")
 speedLabel.Parent = gui
 speedLabel.Size = UDim2.new(0, 120, 0, 30)
@@ -87,7 +99,6 @@ speedLabel.Font = Enum.Font.GothamBold
 speedLabel.TextSize = 14
 speedLabel.Text = "Speed: " .. speed
 
--- + Button
 local plusBtn = Instance.new("TextButton")
 plusBtn.Parent = gui
 plusBtn.Size = UDim2.new(0, 55, 0, 30)
@@ -98,7 +109,6 @@ plusBtn.Font = Enum.Font.GothamBold
 plusBtn.TextSize = 18
 plusBtn.Text = "+"
 
--- - Button
 local minusBtn = Instance.new("TextButton")
 minusBtn.Parent = gui
 minusBtn.Size = UDim2.new(0, 55, 0, 30)
@@ -109,7 +119,6 @@ minusBtn.Font = Enum.Font.GothamBold
 minusBtn.TextSize = 18
 minusBtn.Text = "-"
 
--- BodyVelocity
 local bv = Instance.new("BodyVelocity")
 bv.MaxForce = Vector3.new(0, 0, 0)
 bv.Velocity = Vector3.new(0, 0, 0)
@@ -132,13 +141,11 @@ flyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Increase Speed
 plusBtn.MouseButton1Click:Connect(function()
     speed = speed + 1
     speedLabel.Text = "Speed: " .. speed
 end)
 
--- Decrease Speed
 minusBtn.MouseButton1Click:Connect(function()
     if speed > 1 then
         speed = speed - 1
