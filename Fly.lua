@@ -1,10 +1,11 @@
---// GUI Fly + ToastNotifications
+--// GUI Fly + Roblox-like Toast (Icon + Sound)
 
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 local uis = game:GetService("UserInputService")
 local run = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
 local flying = false
 local speed = 3
@@ -13,6 +14,66 @@ local speed = 3
 local gui = Instance.new("ScreenGui")
 gui.Parent = game.CoreGui
 gui.Name = "FlyGUI"
+
+--==========================
+--== Roblox-like Toast UI ==
+--==========================
+
+local toastGui = Instance.new("ScreenGui", game.CoreGui)
+toastGui.Name = "ToastUI"
+
+local function ShowToast(message)
+    local toast = Instance.new("Frame")
+    toast.Size = UDim2.new(0, 260, 0, 60)
+    toast.Position = UDim2.new(1, -20, 1, 80) -- تحت يمين
+    toast.AnchorPoint = Vector2.new(1, 1)
+    toast.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    toast.BorderSizePixel = 0
+    toast.BackgroundTransparency = 0.1
+    toast.Parent = toastGui
+
+    local corner = Instance.new("UICorner", toast)
+    corner.CornerRadius = UDim.new(0, 10)
+
+    -- Icon
+    local icon = Instance.new("ImageLabel", toast)
+    icon.Size = UDim2.new(0, 40, 0, 40)
+    icon.Position = UDim2.new(0, 10, 0, 10)
+    icon.BackgroundTransparency = 1
+    icon.Image = "rbxassetid://119290557148033" -- أيقونة جميلة
+
+    -- Text
+    local label = Instance.new("TextLabel", toast)
+    label.Size = UDim2.new(1, -60, 1, 0)
+    label.Position = UDim2.new(0, 60, 0, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 16
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Text = message
+
+    -- Sound
+    local sound = Instance.new("Sound", toast)
+    sound.SoundId = "rbxassetid://138118203571469" -- صوت إشعار جميل
+    sound.Volume = 1
+    sound:Play()
+
+    -- دخول toast (يصعد لفوق)
+    TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
+        Position = UDim2.new(1, -20, 1, -10)
+    }):Play()
+
+    task.wait(5)
+
+    -- خروج toast (ينزل لتحت)
+    TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
+        Position = UDim2.new(1, -20, 1, 80)
+    }):Play()
+
+    task.wait(0.4)
+    toast:Destroy()
+end
 
 --==========================
 --== Fly GUI Buttons =======
@@ -69,31 +130,14 @@ bv.Parent = hrp
 
 flyBtn.MouseButton1Click:Connect(function()
     flying = not flying
-
     if flying then
         flyBtn.Text = "Fly: ON"
         bv.MaxForce = Vector3.new(100000, 100000, 100000)
-
-        -- Toast الجديد
-        ToastNotifications.CreateToast({
-            Title = "تم التفعيل",
-            Description = "تم تشغيل الطيران بنجاح",
-            Icon = "rbxassetid://6031068433",
-            Sound = "rbxassetid://4590662766",
-            Duration = 5
-        })
-
+        ShowToast("Fly تم تفعيله")
     else
         flyBtn.Text = "Fly: OFF"
         bv.MaxForce = Vector3.new(0, 0, 0)
-
-        ToastNotifications.CreateToast({
-            Title = "تم الإيقاف",
-            Description = "تم إيقاف الطيران",
-            Icon = "rbxassetid://6031068433",
-            Sound = "rbxassetid://4590662766",
-            Duration = 5
-        })
+        ShowToast("Fly تم إيقافه")
     end
 end)
 
