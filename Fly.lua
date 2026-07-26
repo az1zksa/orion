@@ -1,4 +1,6 @@
---// GUI Fly + Enhanced Roblox-like Toast (Icon + Sound)
+--==========================
+--== Fly GUI + Toast + R6 ==
+--==========================
 
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
@@ -8,15 +10,63 @@ local run = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local flying = false
-local speed = 3
-
--- GUI
-local gui = Instance.new("ScreenGui")
-gui.Parent = game.CoreGui
-gui.Name = "FlyGUI"
+local r6Active = false
+local speed = 1
 
 --==========================
---== Enhanced Toast UI =====
+--== GUI ====================
+--==========================
+
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "FlyGUI"
+
+local function style(btn)
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 10)
+end
+
+local flyBtn = Instance.new("TextButton", gui)
+flyBtn.Size = UDim2.new(0, 140, 0, 45)
+flyBtn.Position = UDim2.new(0, 20, 0, 200)
+flyBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+flyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+flyBtn.Font = Enum.Font.GothamBold
+flyBtn.TextSize = 16
+flyBtn.Text = "Fly: OFF"
+style(flyBtn)
+
+local speedLabel = Instance.new("TextLabel", gui)
+speedLabel.Size = UDim2.new(0, 140, 0, 35)
+speedLabel.Position = UDim2.new(0, 20, 0, 250)
+speedLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedLabel.Font = Enum.Font.GothamBold
+speedLabel.TextSize = 14
+speedLabel.Text = "Speed: " .. speed
+style(speedLabel)
+
+local plusBtn = Instance.new("TextButton", gui)
+plusBtn.Size = UDim2.new(0, 65, 0, 35)
+plusBtn.Position = UDim2.new(0, 20, 0, 295)
+plusBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+plusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+plusBtn.Font = Enum.Font.GothamBold
+plusBtn.TextSize = 18
+plusBtn.Text = "+"
+style(plusBtn)
+
+local minusBtn = Instance.new("TextButton", gui)
+minusBtn.Size = UDim2.new(0, 65, 0, 35)
+minusBtn.Position = UDim2.new(0, 95, 0, 295)
+minusBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+minusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minusBtn.Font = Enum.Font.GothamBold
+minusBtn.TextSize = 18
+minusBtn.Text = "-"
+style(minusBtn)
+
+--==========================
+--== Toast UI ==============
 --==========================
 
 local toastGui = Instance.new("ScreenGui", game.CoreGui)
@@ -28,24 +78,18 @@ local function ShowToast(message)
     toast.Position = UDim2.new(1, -25, 1, 120)
     toast.AnchorPoint = Vector2.new(1, 1)
     toast.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    toast.BorderSizePixel = 0
     toast.BackgroundTransparency = 0.05
     toast.Parent = toastGui
 
-    local corner = Instance.new("UICorner", toast)
-    corner.CornerRadius = UDim.new(0, 12)
+    Instance.new("UICorner", toast).CornerRadius = UDim.new(0, 12)
 
-    -- Icon
     local icon = Instance.new("ImageLabel", toast)
     icon.Size = UDim2.new(0, 45, 0, 45)
     icon.Position = UDim2.new(0, 15, 0, 15)
     icon.BackgroundTransparency = 1
     icon.Image = "rbxassetid://15828140506"
+    Instance.new("UICorner", icon).CornerRadius = UDim.new(0, 8)
 
-    local iconCorner = Instance.new("UICorner", icon)
-    iconCorner.CornerRadius = UDim.new(0, 8)
-
-    -- Text
     local label = Instance.new("TextLabel", toast)
     label.Size = UDim2.new(1, -80, 1, 0)
     label.Position = UDim2.new(0, 75, 0, 0)
@@ -53,23 +97,19 @@ local function ShowToast(message)
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamBold
     label.TextSize = 17
-    label.TextXAlignment = Enum.TextXAlignment.Left
     label.Text = message
 
-    -- Sound
     local sound = Instance.new("Sound", toast)
     sound.SoundId = "rbxassetid://4590662766"
     sound.Volume = 1
     sound:Play()
 
-    -- دخول toast
     TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
         Position = UDim2.new(1, -25, 1, -20)
     }):Play()
 
     task.wait(4)
 
-    -- خروج toast
     TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
         Position = UDim2.new(1, -25, 1, 120)
     }):Play()
@@ -79,142 +119,107 @@ local function ShowToast(message)
 end
 
 --==========================
---== Welcome Toast (AzizGames)
+--== R6 FLY SYSTEM =========
 --==========================
 
-task.wait(1)
+local function StartR6Fly()
+    local plr = player
+    local torso = plr.Character:FindFirstChild("Torso")
+    if not torso then return end
 
-local welcome = Instance.new("Frame")
-welcome.Size = UDim2.new(0, 320, 0, 85)
-welcome.Position = UDim2.new(1, -25, 1, 140)
-welcome.AnchorPoint = Vector2.new(1, 1)
-welcome.BackgroundColor3 = Color3.fromRGB(35, 35, 55)
-welcome.BackgroundTransparency = 0.05
-welcome.BorderSizePixel = 0
-welcome.Parent = toastGui
+    r6Active = true
 
-local wcCorner = Instance.new("UICorner", welcome)
-wcCorner.CornerRadius = UDim.new(0, 14)
+    local ctrl = {f = 0, b = 0, l = 0, r = 0}
+    local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+    local maxspeed = 50
+    local curspeed = 0
 
-local wcIcon = Instance.new("ImageLabel", welcome)
-wcIcon.Size = UDim2.new(0, 50, 0, 50)
-wcIcon.Position = UDim2.new(0, 15, 0, 17)
-wcIcon.BackgroundTransparency = 1
-wcIcon.Image = "rbxassetid://15828140506"
+    local bg = Instance.new("BodyGyro", torso)
+    bg.P = 9e4
+    bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bg.cframe = torso.CFrame
 
-local wcIconCorner = Instance.new("UICorner", wcIcon)
-wcIconCorner.CornerRadius = UDim.new(0, 10)
+    local bv = Instance.new("BodyVelocity", torso)
+    bv.velocity = Vector3.new(0, 0.1, 0)
+    bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
 
-local wcTitle = Instance.new("TextLabel", welcome)
-wcTitle.Size = UDim2.new(1, -80, 0, 35)
-wcTitle.Position = UDim2.new(0, 75, 0, 5)
-wcTitle.BackgroundTransparency = 1
-wcTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-wcTitle.Font = Enum.Font.GothamBold
-wcTitle.TextSize = 19
-wcTitle.TextXAlignment = Enum.TextXAlignment.Left
-wcTitle.Text = "مرحباً في Fly"
+    plr.Character.Humanoid.PlatformStand = true
 
-local wcDesc = Instance.new("TextLabel", welcome)
-wcDesc.Size = UDim2.new(1, -80, 0, 40)
-wcDesc.Position = UDim2.new(0, 75, 0, 40)
-wcDesc.BackgroundTransparency = 1
-wcDesc.TextColor3 = Color3.fromRGB(220, 220, 220)
-wcDesc.Font = Enum.Font.Gotham
-wcDesc.TextSize = 14
-wcDesc.TextXAlignment = Enum.TextXAlignment.Left
-wcDesc.Text = "من صنع AzizGames – استمتع! أقوى تحديث!"
+    -- KEYBOARD CONTROL
+    uis.InputBegan:Connect(function(key)
+        if not r6Active then return end
+        if key.KeyCode == Enum.KeyCode.W then ctrl.f = speed end
+        if key.KeyCode == Enum.KeyCode.S then ctrl.b = -speed end
+        if key.KeyCode == Enum.KeyCode.A then ctrl.l = -speed end
+        if key.KeyCode == Enum.KeyCode.D then ctrl.r = speed end
+    end)
 
-local wcSound = Instance.new("Sound", welcome)
-wcSound.SoundId = "rbxassetid://4590662766"
-wcSound.Volume = 1
-wcSound:Play()
+    uis.InputEnded:Connect(function(key)
+        if not r6Active then return end
+        if key.KeyCode == Enum.KeyCode.W then ctrl.f = 0 end
+        if key.KeyCode == Enum.KeyCode.S then ctrl.b = 0 end
+        if key.KeyCode == Enum.KeyCode.A then ctrl.l = 0 end
+        if key.KeyCode == Enum.KeyCode.D then ctrl.r = 0 end
+    end)
 
-TweenService:Create(welcome, TweenInfo.new(0.28, Enum.EasingStyle.Quint), {
-    Position = UDim2.new(1, -25, 1, -25)
-}):Play()
+    -- MAIN LOOP
+    spawn(function()
+        while r6Active do
+            run.RenderStepped:Wait()
 
-task.wait(4)
+            if ctrl.f ~= 0 or ctrl.b ~= 0 or ctrl.l ~= 0 or ctrl.r ~= 0 then
+                curspeed = curspeed + 0.5 + (curspeed / maxspeed)
+                if curspeed > maxspeed then curspeed = maxspeed end
+            elseif curspeed ~= 0 then
+                curspeed = curspeed - 1
+                if curspeed < 0 then curspeed = 0 end
+            end
 
-TweenService:Create(welcome, TweenInfo.new(0.28, Enum.EasingStyle.Quint), {
-    Position = UDim2.new(1, -25, 1, 140)
-}):Play()
+            if ctrl.f ~= 0 or ctrl.b ~= 0 or ctrl.l ~= 0 or ctrl.r ~= 0 then
+                bv.velocity =
+                    ((workspace.CurrentCamera.CFrame.LookVector * (ctrl.f + ctrl.b)) +
+                    ((workspace.CurrentCamera.CFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * .2, 0).p)
+                    - workspace.CurrentCamera.CFrame.p)) * curspeed
 
-task.wait(0.3)
-welcome:Destroy()
+                lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+            elseif curspeed ~= 0 then
+                bv.velocity =
+                    ((workspace.CurrentCamera.CFrame.LookVector * (lastctrl.f + lastctrl.b)) +
+                    ((workspace.CurrentCamera.CFrame * CFrame.new(lastctrl.l + lastctrl.r, (lastctrl.f + lastctrl.b) * .2, 0).p)
+                    - workspace.CurrentCamera.CFrame.p)) * curspeed
+            else
+                bv.velocity = Vector3.new(0, 0, 0)
+            end
 
---==========================
---== Fly GUI Buttons =======
---==========================
+            bg.cframe = workspace.CurrentCamera.CFrame *
+                CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * curspeed / maxspeed), 0, 0)
+        end
 
-local function style(btn)
-    local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 10)
+        bg:Destroy()
+        bv:Destroy()
+        plr.Character.Humanoid.PlatformStand = false
+    end)
 end
 
-local flyBtn = Instance.new("TextButton")
-flyBtn.Parent = gui
-flyBtn.Size = UDim2.new(0, 140, 0, 45)
-flyBtn.Position = UDim2.new(0, 20, 0, 200)
-flyBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
-flyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-flyBtn.Font = Enum.Font.GothamBold
-flyBtn.TextSize = 16
-flyBtn.Text = "Fly: OFF"
-style(flyBtn)
-
-local speedLabel = Instance.new("TextLabel")
-speedLabel.Parent = gui
-speedLabel.Size = UDim2.new(0, 140, 0, 35)
-speedLabel.Position = UDim2.new(0, 20, 0, 250)
-speedLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
-speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedLabel.Font = Enum.Font.GothamBold
-speedLabel.TextSize = 14
-speedLabel.Text = "Speed: " .. speed
-style(speedLabel)
-
-local plusBtn = Instance.new("TextButton")
-plusBtn.Parent = gui
-plusBtn.Size = UDim2.new(0, 65, 0, 35)
-plusBtn.Position = UDim2.new(0, 20, 0, 295)
-plusBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-plusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-plusBtn.Font = Enum.Font.GothamBold
-plusBtn.TextSize = 18
-plusBtn.Text = "+"
-style(plusBtn)
-
-local minusBtn = Instance.new("TextButton")
-minusBtn.Parent = gui
-minusBtn.Size = UDim2.new(0, 65, 0, 35)
-minusBtn.Position = UDim2.new(0, 95, 0, 295)
-minusBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-minusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-minusBtn.Font = Enum.Font.GothamBold
-minusBtn.TextSize = 18
-minusBtn.Text = "-"
-style(minusBtn)
-
-local bv = Instance.new("BodyVelocity")
-bv.MaxForce = Vector3.new(0, 0, 0)
-bv.Velocity = Vector3.new(0, 0, 0)
-bv.Parent = hrp
+local function StopR6Fly()
+    r6Active = false
+end
 
 --==========================
---== Fly Toggle Logic ======
+--== BUTTON LOGIC ==========
 --==========================
 
 flyBtn.MouseButton1Click:Connect(function()
     flying = not flying
+
     if flying then
         flyBtn.Text = "Fly: ON"
-        bv.MaxForce = Vector3.new(100000, 100000, 100000)
         ShowToast("تم تفعيل الطيران")
+        StartR6Fly()
     else
         flyBtn.Text = "Fly: OFF"
-        bv.MaxForce = Vector3.new(0, 0, 0)
         ShowToast("تم إيقاف الطيران")
+        StopR6Fly()
     end
 end)
 
@@ -227,30 +232,5 @@ minusBtn.MouseButton1Click:Connect(function()
     if speed > 1 then
         speed = speed - 1
         speedLabel.Text = "Speed: " .. speed
-    end
-end)
-
---==========================
---== Fly Movement ==========
---==========================
-
-run.RenderStepped:Connect(function()
-    if flying then
-        local dir = Vector3.new(0,0,0)
-
-        if uis:IsKeyDown(Enum.KeyCode.W) then
-            dir = dir + workspace.CurrentCamera.CFrame.LookVector
-        end
-        if uis:IsKeyDown(Enum.KeyCode.S) then
-            dir = dir - workspace.CurrentCamera.CFrame.LookVector
-        end
-        if uis:IsKeyDown(Enum.KeyCode.A) then
-            dir = dir - workspace.CurrentCamera.CFrame.RightVector
-        end
-        if uis:IsKeyDown(Enum.KeyCode.D) then
-            dir = dir + workspace.CurrentCamera.CFrame.RightVector
-        end
-
-        bv.Velocity = dir * speed
     end
 end)
