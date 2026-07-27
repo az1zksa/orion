@@ -171,11 +171,64 @@ MainTab:AddToggle({
 })
 
 -----------------------------------------------------------
----------------------- FLY SYSTEM --------------------------
+---------------------- FLY SYSTEM (NEW CLEAN) -------------
 -----------------------------------------------------------
 
 local flying = false
 local flySpeed = 2
+
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local function setIdleAnimation()
+    local hum = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+    if hum then
+        hum:LoadAnimation(Instance.new("Animation")):Play() -- يلغي أنميشن المشي
+    end
+end
+
+local function flyLoop()
+    local char = game.Players.LocalPlayer.Character
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChild("Humanoid")
+
+    if not hrp or not hum then return end
+
+    hum.PlatformStand = true -- يمنع الأنميشن
+
+    RunService.RenderStepped:Connect(function()
+        if flying then
+            local moveVector = Vector3.new(0,0,0)
+
+            -- W A S D
+            if UIS:IsKeyDown(Enum.KeyCode.W) then
+                moveVector = moveVector + hrp.CFrame.LookVector
+            end
+            if UIS:IsKeyDown(Enum.KeyCode.S) then
+                moveVector = moveVector - hrp.CFrame.LookVector
+            end
+            if UIS:IsKeyDown(Enum.KeyCode.A) then
+                moveVector = moveVector - hrp.CFrame.RightVector
+            end
+            if UIS:IsKeyDown(Enum.KeyCode.D) then
+                moveVector = moveVector + hrp.CFrame.RightVector
+            end
+
+            -- الأسهم ↑ ↓
+            if UIS:IsKeyDown(Enum.KeyCode.Up) then
+                moveVector = moveVector + Vector3.new(0,1,0)
+            end
+            if UIS:IsKeyDown(Enum.KeyCode.Down) then
+                moveVector = moveVector - Vector3.new(0,1,0)
+            end
+
+            -- السرعة تعتمد على Slider فقط
+            local speed = flySpeed * 5
+
+            hrp.CFrame = hrp.CFrame + (moveVector * speed * RunService.RenderStepped:Wait())
+        end
+    end)
+end
 
 MainTab:AddToggle({
     Name = "الطيران",
@@ -183,11 +236,13 @@ MainTab:AddToggle({
     Default = false,
     Callback = function(Value)
         flying = Value
-        local hum = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local hum = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
 
-        while flying do
-            hum.Velocity = hum.CFrame.LookVector * flySpeed * 50
-            task.wait()
+        if Value then
+            setIdleAnimation()
+            flyLoop()
+        else
+            if hum then hum.PlatformStand = false end
         end
     end
 })
@@ -196,7 +251,7 @@ MainTab:AddSlider({
     Name = "سرعة طيران",
     Icon = "rbxassetid://6031091004",
     Min = 1,
-    Max = 10,
+    Max = 99999, -- رفعتها عشان يصير عندك سرعة غير محدودة بدون Toggle
     Default = 2,
     Increment = 1,
     Callback = function(Value)
