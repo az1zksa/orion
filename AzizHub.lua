@@ -44,7 +44,7 @@ local Window = OrionLib:MakeWindow({
 
 --== Creating Tabs ==--
 local MainTab = Window:MakeTab({
-    Name = "Main",
+    Name = "القائمة",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
@@ -100,7 +100,7 @@ local function RemoveESP(player)
 end
 
 MainTab:AddToggle({
-    Name = "ESP Players",
+    Name = "كشف لاعبين",
     Icon = "rbxassetid://6031097221",
     Default = false,
     Callback = function(Value)
@@ -124,7 +124,7 @@ MainTab:AddToggle({
 -----------------------------------------------------------
 
 MainTab:AddSlider({
-    Name = "WalkSpeed",
+    Name = "سرعة المشي",
     Icon = "rbxassetid://6022668888",
     Min = 16,
     Max = 200,
@@ -138,7 +138,7 @@ MainTab:AddSlider({
 })
 
 MainTab:AddSlider({
-    Name = "JumpPower",
+    Name = "قوة القفز",
     Icon = "rbxassetid://6022668895",
     Min = 50,
     Max = 300,
@@ -156,7 +156,7 @@ MainTab:AddSlider({
 -----------------------------------------------------------
 
 MainTab:AddToggle({
-    Name = "FullBright",
+    Name = "الضوء العالي",
     Icon = "rbxassetid://6031090990",
     Default = false,
     Callback = function(Value)
@@ -178,7 +178,7 @@ local flying = false
 local flySpeed = 2
 
 MainTab:AddToggle({
-    Name = "Fly",
+    Name = "الطيران",
     Icon = "rbxassetid://6031091004",
     Default = false,
     Callback = function(Value)
@@ -193,7 +193,7 @@ MainTab:AddToggle({
 })
 
 MainTab:AddSlider({
-    Name = "Fly Speed",
+    Name = "سرعة طيران",
     Icon = "rbxassetid://6031091004",
     Min = 1,
     Max = 10,
@@ -211,7 +211,7 @@ MainTab:AddSlider({
 local noclip = false
 
 MainTab:AddToggle({
-    Name = "Noclip",
+    Name = "اختراق الجدران",
     Icon = "rbxassetid://6031094667",
     Default = false,
     Callback = function(Value)
@@ -285,7 +285,7 @@ for _, plr in pairs(game.Players:GetPlayers()) do
 end
 
 MainTab:AddDropdown({
-    Name = "Select Player",
+    Name = "اختار لاعب",
     Icon = "rbxassetid://6031094662",
     Default = "",
     Options = players,
@@ -295,7 +295,7 @@ MainTab:AddDropdown({
 })
 
 MainTab:AddButton({
-    Name = "Teleport Behind Player",
+    Name = "تنقل خلف لاعب",
     Icon = "rbxassetid://6031094662",
     Callback = function()
         if selectedPlayer then
@@ -327,7 +327,7 @@ MainTab:AddButton({
 -----------------------------------------------------------
 
 MainTab:AddButton({
-    Name = "Anti AFK",
+    Name = "مانع AFK",
     Icon = "rbxassetid://6031094665",
     Callback = function()
         local vu = game:GetService("VirtualUser")
