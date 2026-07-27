@@ -251,7 +251,7 @@ MainTab:AddToggle({
 
             -- صوت تنبيه
             local sound = Instance.new("Sound")
-            sound.SoundId = "rbxassetid://4590662766" -- صوت جميل
+            sound.SoundId = "rbxassetid://131661992591924" -- صوت جميل
             sound.Volume = 1
             sound.Parent = workspace
             sound:Play()
