@@ -338,6 +338,51 @@ MainTab:AddButton({
         end)
     end
 })
+-----------------------------------------------------------
+---------------------- PLAYER JOIN / LEAVE TOAST ----------
+-----------------------------------------------------------
+
+-- صوت الدخول والخروج
+local function playSound()
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://131661992591924" -- صوت تنبيه جميل
+    sound.Volume = 1
+    sound.Parent = workspace
+    sound:Play()
+    game.Debris:AddItem(sound, 6)
+end
+
+-- Toast عند دخول لاعب
+game.Players.PlayerAdded:Connect(function(plr)
+    local thumbType = Enum.ThumbnailType.HeadShot
+    local thumbSize = Enum.ThumbnailSize.Size420x420
+    local content = game.Players:GetUserThumbnailAsync(plr.UserId, thumbType, thumbSize)
+
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Aziz Hub",
+        Text = plr.DisplayName .. " (" .. plr.Name .. ") دخل السيرفر",
+        Icon = content,
+        Duration = 5
+    })
+
+    playSound()
+end)
+
+-- Toast عند خروج لاعب
+game.Players.PlayerRemoving:Connect(function(plr)
+    local thumbType = Enum.ThumbnailType.HeadShot
+    local thumbSize = Enum.ThumbnailSize.Size420x420
+    local content = game.Players:GetUserThumbnailAsync(plr.UserId, thumbType, thumbSize)
+
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Aziz Hub",
+        Text = plr.DisplayName .. " (" .. plr.Name .. ") خرج من السيرفر",
+        Icon = content,
+        Duration = 5
+    })
+
+    playSound()
+end)
 
 -----------------------------------------------------------
 ---------------------- INIT -------------------------------
