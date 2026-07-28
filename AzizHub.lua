@@ -170,7 +170,7 @@ MainTab:AddToggle({
     end
 })
 -----------------------------------------------------------
----------------------- FLY SYSTEM (FINAL FIX) -------------
+---------------------- FLY SYSTEM (FIXED) -----------------
 -----------------------------------------------------------
 
 local flying = false
@@ -178,25 +178,24 @@ local flySpeed = 2
 
 local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
 
-local function setIdleAnimation()
-    local hum = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
-    if hum then
-        hum:LoadAnimation(Instance.new("Animation")):Play()
-    end
-end
+-- حذف setIdleAnimation لأنها تسبب مشاكل
+-- لو تبي أنيميشن مخصص، حط AnimationId هنا لاحقًا
 
 local function flyLoop()
-    local char = game.Players.LocalPlayer.Character
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    local hum = char:FindFirstChild("Humanoid")
-
-    if not hrp or not hum then return end
-
-    hum.PlatformStand = true
-
     while flying do
-        local moveVector = Vector3.new(0,0,0)
+        local char = player.Character
+        if not char then break end
+
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        local hum = char:FindFirstChild("Humanoid")
+
+        if not hrp or not hum then break end
+
+        hum.PlatformStand = true
+
+        local moveVector = Vector3.new(0, 0, 0)
 
         if UIS:IsKeyDown(Enum.KeyCode.W) then
             moveVector += hrp.CFrame.LookVector
@@ -212,18 +211,24 @@ local function flyLoop()
         end
 
         if UIS:IsKeyDown(Enum.KeyCode.Up) then
-            moveVector += Vector3.new(0,1,0)
+            moveVector += Vector3.new(0, 1, 0)
         end
         if UIS:IsKeyDown(Enum.KeyCode.Down) then
-            moveVector -= Vector3.new(0,1,0)
+            moveVector -= Vector3.new(0, 1, 0)
         end
 
-        hrp.CFrame = hrp.CFrame + (moveVector * flySpeed * 0.5)
+        if moveVector.Magnitude > 0 then
+            hrp.CFrame = hrp.CFrame + (moveVector.Unit * flySpeed * 0.5)
+        end
 
         task.wait()
     end
 
-    hum.PlatformStand = false
+    local char = player.Character
+    local hum = char and char:FindFirstChild("Humanoid")
+    if hum then
+        hum.PlatformStand = false
+    end
 end
 
 MainTab:AddToggle({
@@ -232,10 +237,10 @@ MainTab:AddToggle({
     Default = false,
     Callback = function(Value)
         flying = Value
-        local hum = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+        local char = player.Character
+        local hum = char and char:FindFirstChild("Humanoid")
 
         if Value then
-            setIdleAnimation()
             task.spawn(flyLoop)
         else
             if hum then hum.PlatformStand = false end
@@ -247,7 +252,7 @@ MainTab:AddSlider({
     Name = "سرعة طيران",
     Icon = "rbxassetid://6031091004",
     Min = 1,
-    Max = 99999,
+    Max = 200, -- خليتها منطقية أكثر، تقدر تغيّرها
     Default = 2,
     Increment = 1,
     Callback = function(Value)
